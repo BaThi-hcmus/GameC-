@@ -1,25 +1,42 @@
-// StatusEffect.h
 #pragma once
-class Player;
+#include <iostream>
 
-/**
- * @brief Lớp cha cho mọi hiệu ứng trạng thái trong game
- */
+using namespace std;
+
+class Player; 
+
+enum class EffectTag {
+    Jackpot,
+    Stun,
+    Dodge,
+    DamageReduction,
+    CriticalStrike
+};
+
 class StatusEffect {
 protected:
-    int duration; // số lượt còn lại
-
+    int duration;
 public:
-    StatusEffect(int turns) : duration(turns) {}
+    explicit StatusEffect(int turns) : duration(turns) {}
     virtual ~StatusEffect() = default;
 
-    // Các hook – effect nào cần thì override
+    // ===== QUERY =====
+    virtual bool hasTag(EffectTag) { return false; }
+
+    // ===== LIFECYCLE =====
     virtual void onApply(Player&) {}
-    virtual void onTurnStart(Player&) {}
-    virtual void onAfterReceiveDamage(Player&, int& damage) {}
-    virtual void onTurnEnd(Player&) {}
     virtual void onRemove(Player&) {}
 
-    // Giảm lượt, trả về true nếu hết hạn
-    bool tick() { return --duration <= 0; }
+    // ===== TURN =====
+    virtual void onTurnStart(Player&) {}
+    virtual void onTurnEnd(Player&) {}
+
+    // ===== COMBAT =====
+    virtual void onBeforeDealDamage(Player&, int&) {}
+    virtual void onBeforeReceiveDamage(Player&, int&) {}
+    virtual void onAfterReceiveDamage(Player&, int&) {}
+
+    bool tick() {
+        return --duration <= 0;
+    }
 };

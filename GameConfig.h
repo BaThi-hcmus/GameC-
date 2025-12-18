@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
 #include <unordered_map>
+#include <string>
+#include "ConfigKey.h"
 
 class GameConfig {
 public:
@@ -8,8 +9,8 @@ public:
 
     void loadFromFile(const std::string& path);
 
-    int    getInt(const std::string& key) const;
-    float  getFloat(const std::string& key) const;
+    int   getInt(ConfigKey key) const;
+    float getFloat(ConfigKey key) const;
 
 private:
     GameConfig() = default;

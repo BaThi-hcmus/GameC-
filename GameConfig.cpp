@@ -1,6 +1,6 @@
 #include "GameConfig.h"
+#include "ConfigKeyMap.h"
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
 GameConfig& GameConfig::instance() {
@@ -11,7 +11,7 @@ GameConfig& GameConfig::instance() {
 void GameConfig::loadFromFile(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
-        std::cerr << "Khong the mo file config: " << path << std::endl;
+        std::cerr << "Khong the mo file config: " << path << '\n';
         return;
     }
 
@@ -22,23 +22,19 @@ void GameConfig::loadFromFile(const std::string& path) {
         auto pos = line.find('=');
         if (pos == std::string::npos) continue;
 
-        std::string key   = line.substr(0, pos);
+        std::string key = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
 
         m_values[key] = value;
     }
-
-    std::cout << "[GameConfig] Da load xong config.\n";
-    std::cout << "Cac gia tri hien tai:\n";
-    for (auto& [k, v] : m_values) {
-        std::cout << "[" << k << "] = " << v << '\n';
-    }
 }
 
-int GameConfig::getInt(const std::string& key) const {
-    return std::stoi(m_values.at(key));
+int GameConfig::getInt(ConfigKey key) const {
+    const auto& strKey = ConfigKeyToString.at(key);
+    return std::stoi(m_values.at(strKey));
 }
 
-float GameConfig::getFloat(const std::string& key) const {
-    return std::stof(m_values.at(key));
+float GameConfig::getFloat(ConfigKey key) const {
+    const auto& strKey = ConfigKeyToString.at(key);
+    return std::stof(m_values.at(strKey));
 }

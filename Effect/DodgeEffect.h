@@ -1,5 +1,4 @@
-// DodgeEffect.h
-#pragma once
+#pragma once 
 #include "StatusEffect.h"
 
 class DodgeEffect : public StatusEffect {
@@ -9,6 +8,14 @@ public:
     DodgeEffect(int turns, float c)
         : StatusEffect(turns), chance(c) {}
 
-    void onApply(Player& p) override;
-    void onRemove(Player& p) override;
+    void onBeforeReceiveDamage(Player&, int& damage) override {
+        if (rand() % 100 < chance * 100) {
+            std::cout << "[DODGE] Ne don thanh cong!\n";
+            damage = 0;
+        }
+    }
+
+    bool hasTag(EffectTag tag) override {
+        return tag == EffectTag::Dodge;
+    }
 };

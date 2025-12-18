@@ -26,7 +26,7 @@ private:
      * @brief Tổng số lá bài chuẩn trong Deck.
      * Phải KHỚP với số lượng khởi tạo trong initializeFullDeck().
      */
-    const int INITIAL_DECK_SIZE = GameConfig::instance().getInt("DECK_INITIAL_SIZE");
+    const int INITIAL_DECK_SIZE = GameConfig::instance().getInt(ConfigKey::DECK_INITIAL_SIZE);
 
     /**
      * @brief Tạo lại toàn bộ bộ bài theo luật game.
@@ -54,7 +54,7 @@ public:
      * @brief Kiểm tra và refill Deck nếu số bài dưới ngưỡng. mắc định dưới 10 lá.
      * @param threshold Số bài tối thiểu cho phép
      */
-    void checkAndRefillDeck(int threshold = GameConfig::instance().getInt("DECK_MIN_SIZE"));
+    void checkAndRefillDeck(int threshold = GameConfig::instance().getInt(ConfigKey::DECK_MIN_SIZE));
 
     /**
      * @brief Lấy số lượng bài hiện tại trong Deck.

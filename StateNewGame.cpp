@@ -63,17 +63,41 @@ void StateNewGame::Handle() {
 	// ===== RESET TRANG THAI LUOT =====
     m_current->resetTurnState();
 
-	// ===== PHAN BO CHU LUC =====
-    int atk, def, jp;
-    cout << "\nPhan bo 5 diem chu luc (Tan cong / Phong thu / Jackpot): ";
-    cin >> atk >> def >> jp;
+    //xử lí hiệu ứng choáng 
+    if (m_current->hasEffect(EffectTag::Stun)) {
+        cout << "[CHOANG] Ban bi mat luot!\n";
 
-    while (atk + def + jp != Player::MAX_CURSED_ENERGY) {
-        cout << "Tong phai bang 5, nhap lai: ";
-        cin >> atk >> def >> jp;
+        // Hiệu ứng cuối lượt vẫn chạy nếu có (như đốt, độc,...)
+        m_current->updateEffectsEndTurn();
+
+
+        processEndOfTurn();
+        if (m_isGameOver)
+            return;
+
+        swapTurns();
+        drawHand();
+        return;
     }
-    m_current->allocateCursedEnergy(atk, def, jp);
 
+    //kích hoạt các hiệu ứng đầu lượt : jackpot
+    for (auto& eff : m_current->effects) {
+        eff->onTurnStart(*m_current);
+    }
+
+    //nếu ko có hiệu ứng jackpot thì mới cho phép chủ động phân bố chú lực
+    if(!m_current->hasEffect(EffectTag::Jackpot)) {
+        // ===== PHAN BO CHU LUC =====
+        int atk, def, jp;
+        cout << "\nPhan bo 5 diem chu luc (Tan cong / Phong thu / Jackpot): ";
+        cin >> atk >> def >> jp;
+
+        while (atk + def + jp != Player::MAX_CURSED_ENERGY) {
+            cout << "Tong phai bang 5, nhap lai: ";
+            cin >> atk >> def >> jp;
+        }
+        m_current->allocateCursedEnergy(atk, def, jp);
+    }
 
     cout << " ===> Cac la bai trong tay:" << endl;
     for (int i = 0; i < m_hand.size(); ++i)
@@ -90,10 +114,10 @@ void StateNewGame::Handle() {
     }
 
 	// ===== CAP NHAT TRANG THAI CUOI LUOT =====
-    m_current->updateStatus();
-    m_opponent->updateStatus();
+    m_current->updateEffectsEndTurn();
 
     processEndOfTurn();
+
     if (!m_isGameOver) {
         swapTurns();
         drawHand();

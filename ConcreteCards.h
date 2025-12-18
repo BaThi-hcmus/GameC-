@@ -2,6 +2,9 @@
 #include "Card.h"
 #include "Player.h"
 #include "GameConfig.h"
+#include "Effect/StunEffect.h"
+#include "Effect/DamageReductionEffect.h"
+#include "Effect/DodgeEffect.h"
 
 #include <iostream>
 #include <format>
@@ -19,7 +22,7 @@ class DamageCard : public Card {
 private:
     int damageAmount;
 public:
-    DamageCard(int dmg = GameConfig::instance().getInt("CARD_DAMAGE_NORMAL"))
+    DamageCard(int dmg = GameConfig::instance().getInt(ConfigKey::CARD_DAMAGE_NORMAL))
         : Card(format("Tan Cong Thuong ({} dame)", dmg), CardCategory::Damage), damageAmount(dmg) {}
 
     void execute(Player& self, Player& target) override {
@@ -39,13 +42,13 @@ class StunAttackCard : public Card {
 private:
     int damageAmount;
 public:
-    StunAttackCard(int dmg = GameConfig::instance().getInt("CARD_DAMAGE_STUN"))
+    StunAttackCard(int dmg = GameConfig::instance().getInt(ConfigKey::CARD_DAMAGE_STUN))
         : Card(format("Tan Cong Gay Choang ({} dame, gay choang doi thu 1 luot)", dmg), CardCategory::Damage), damageAmount(dmg) {}
 
     void execute(Player& self, Player& target) override {
         cout << format(">> Su dung la bai: {} ", name);
         target.receiveAttack(damageAmount, self);
-        target.applyStun(1);
+        target.addEffect(std::make_unique<StunEffect>(1));
 
         cout << "!! Doi thu bi CHOANG trong 1 luot toi!" << endl;
     }
@@ -62,7 +65,7 @@ class PierceAttackCard : public Card {
 private : 
     int damageAmount;
 public:
-    PierceAttackCard(int dmg = GameConfig::instance().getInt("CARD_DAMAGE_PIERCE"))
+    PierceAttackCard(int dmg = GameConfig::instance().getInt(ConfigKey::CARD_DAMAGE_PIERCE))
         : Card(format("Tan Cong Pha Giap ({} dame)", dmg), CardCategory::Damage), damageAmount(dmg) {}
 
     void execute(Player& self, Player& target) override {
@@ -84,7 +87,7 @@ class ShieldCard_50 : public Card {
 private:
     int shieldAmount;
 public:
-    ShieldCard_50(int shield = GameConfig::instance().getInt("CARD_SHIELD_GAIN"))
+    ShieldCard_50(int shield = GameConfig::instance().getInt(ConfigKey::CARD_SHIELD_GAIN))
         : Card(format("Phong Thu Thuong (+{} shield)", shield), CardCategory::Defense), shieldAmount(shield) {}
 
     void execute(Player& self, Player& target) override {
@@ -104,12 +107,14 @@ class ReduceDamageCard : public Card {
 private:
     float reductionRatio;
 public:
-    ReduceDamageCard(float ratio = GameConfig::instance().getFloat("CARD_DAMAGE_REDUCTION_RATIO"))
+    ReduceDamageCard(float ratio = GameConfig::instance().getFloat(ConfigKey::CARD_DAMAGE_REDUCTION_RATIO))
         : Card(format("Giam {}% sat thuong nhan vao", ratio * 100), CardCategory::Defense), reductionRatio(ratio) {}
 
     void execute(Player& self, Player& target) override {
         cout << ">> Su dung la bai kich hoat phong thu giam sat thuong!" << endl;
-        self.activateDamageReduction(reductionRatio);
+        self.addEffect(
+            std::make_unique<DamageReductionEffect>(reductionRatio, 1)
+        );
     }
 
     void printDescription() const override {
@@ -124,12 +129,14 @@ class DodgeCard : public Card {
 private:
     float dodgeChance;
 public:
-    DodgeCard(float chance = GameConfig::instance().getFloat("CARD_DODGE_CHANCE"))
+    DodgeCard(float chance = GameConfig::instance().getFloat(ConfigKey::CARD_DODGE_CHANCE))
         : Card(format("Ne Tranh {}%", chance * 100), CardCategory::Defense), dodgeChance(chance) {}
 
     void execute(Player& self, Player& target) override {
         cout << ">> Su dung la bai kich hoat phong thu ne tranh!" << endl;
-        self.activateDodge(dodgeChance);
+        self.addEffect(
+            std::make_unique<DodgeEffect>(dodgeChance, 1)
+        );
     }
 
     void printDescription() const override {
@@ -146,7 +153,7 @@ class RageIncreaseCard : public Card {
 private:
     int rageIncrease;
 public:
-    RageIncreaseCard(int increase = GameConfig::instance().getInt("CARD_RAGE_GAIN"))
+    RageIncreaseCard(int increase = GameConfig::instance().getInt(ConfigKey::CARD_RAGE_GAIN))
         : Card(format("Tang {} diem No II", increase), CardCategory::Effect), rageIncrease(increase) {}
 
     void execute(Player& self, Player& target) override {

@@ -4,7 +4,8 @@
             "name": "MinGW64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:/project_C++/SFLMGame"
+                "D:/project_C++/SFLMGame",
+                "${workspaceFolder}/Effect"
             ],
             "defines": [
                 "_DEBUG",

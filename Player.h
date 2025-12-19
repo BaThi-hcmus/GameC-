@@ -3,6 +3,8 @@
 #include <vector>
 #include "GameConfig.h"
 #include "Effect/StatusEffect.h"
+#include "Effect/EffectScheduler.h"
+#include "StateNewGame.h"
 
 using namespace std;
 
@@ -23,33 +25,16 @@ public:
     int defenseEnergy;
     int jackpotEnergy;
 
-    // ===== EFFECT SYSTEM =====
-    std::vector<std::unique_ptr<StatusEffect>> effects;
-
-    // ===== QUERY EFFECT =====
-    bool hasEffect(EffectTag tag);
-
     // ===== LIFECYCLE =====
     Player();
     static void loadConfig();
 
-    // ===== EFFECT MANAGEMENT =====
-    void addEffect(std::unique_ptr<StatusEffect> eff);
-    void updateEffectsEndTurn();
-
     // ===== TURN =====
     void resetTurnState();
-    void updateStatus();
 
     // ===== GAMEPLAY =====
     void allocateCursedEnergy(int atk, int def, int jackpot);
-    void receiveAttack(int baseDamage, Player& attacker);
-    void receivePierceAttack(int baseDamage, Player& attacker);
 
     void addShield(int amount);
     void increaseRage(int amount);
-
-    // ===== JACKPOT =====
-    void rollJackpot(int times, Player& target);
-    void activateJackpot(Player& target);
 };

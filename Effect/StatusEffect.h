@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "../Damage/Damage.h"
 
 using namespace std;
 
@@ -24,19 +25,13 @@ public:
     virtual bool hasTag(EffectTag) { return false; }
 
     // ===== LIFECYCLE =====
-    virtual void onApply(Player&) {}
-    virtual void onRemove(Player&) {}
+    virtual void onApply(Player&, Damage* dmg = nullptr) {}
 
-    // ===== TURN =====
-    virtual void onTurnStart(Player&) {}
-    virtual void onTurnEnd(Player&) {}
+    virtual void tick() {
+        duration--;
+    }
 
-    // ===== COMBAT =====
-    virtual void onBeforeDealDamage(Player&, int&) {}
-    virtual void onBeforeReceiveDamage(Player&, int&) {}
-    virtual void onAfterReceiveDamage(Player&, int&) {}
-
-    bool tick() {
-        return --duration <= 0;
+    bool isExpired() const {
+        return duration <= 0;
     }
 };

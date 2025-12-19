@@ -1,12 +1,15 @@
 #include "StateNewGame.h"
 #include "StateManager.h"
 #include "GameConfig.h"
-
+#include "BattleSystem.h"
+#include <format>
 #include <iostream>
 
 using namespace std;
 
-StateNewGame::StateNewGame() {}
+StateNewGame::StateNewGame() {
+    battle = new BattleSystem(scheduler);
+}
 
 void StateNewGame::Init() {
     cout << "\n===== BAT DAU TRAN DAU=====" << endl;
@@ -21,12 +24,12 @@ void StateNewGame::Init() {
 
     m_current  = m_player1.get();
     m_opponent = m_player2.get();
-
-    drawHand(); // rút 6 lá đầu tiên
 }
 
 // hàm rút 6 lá bài mỗi lượt
 void StateNewGame::drawHand() {
+    cout << "\n[DECK] rut 6 la tu bo bai : \n";
+
     m_hand.clear();
     while (m_hand.size() < 6) {
         auto c = m_deck->drawCard(); //rút 1 lá ngẫu nhiên từ deck
@@ -42,6 +45,12 @@ void StateNewGame::swapTurns() {
     std::swap(m_current, m_opponent);
     m_turnCount++;
 }
+
+void StateNewGame::endTurn() {
+    scheduler.tickPlayer(*m_current);   // giảm duration, xóa effect hết hạn
+    swapTurns();
+}
+
 
 void StateNewGame::processEndOfTurn() {
     if (m_current->hp <= 0 || m_opponent->hp <= 0)
@@ -63,30 +72,28 @@ void StateNewGame::Handle() {
 	// ===== RESET TRANG THAI LUOT =====
     m_current->resetTurnState();
 
-    //xử lí hiệu ứng choáng 
-    if (m_current->hasEffect(EffectTag::Stun)) {
-        cout << "[CHOANG] Ban bi mat luot!\n";
+    // xử lí choáng 
+    if (scheduler.hasEffect(m_current, EffectTag::Stun)) {
+        cout << "[CHOANG] Ban bi mat luot!\n\n";
 
         // Hiệu ứng cuối lượt vẫn chạy nếu có (như đốt, độc,...)
-        m_current->updateEffectsEndTurn();
-
+        battle->onTurnEnd(*m_current);
 
         processEndOfTurn();
         if (m_isGameOver)
             return;
 
-        swapTurns();
-        drawHand();
+        endTurn();
         return;
     }
 
+    drawHand();
+
     //kích hoạt các hiệu ứng đầu lượt : jackpot
-    for (auto& eff : m_current->effects) {
-        eff->onTurnStart(*m_current);
-    }
+    battle->onTurnStart(*m_current);
 
     //nếu ko có hiệu ứng jackpot thì mới cho phép chủ động phân bố chú lực
-    if(!m_current->hasEffect(EffectTag::Jackpot)) {
+    if(!scheduler.hasEffect(m_current, EffectTag::Jackpot)) {
         // ===== PHAN BO CHU LUC =====
         int atk, def, jp;
         cout << "\nPhan bo 5 diem chu luc (Tan cong / Phong thu / Jackpot): ";
@@ -99,6 +106,11 @@ void StateNewGame::Handle() {
         m_current->allocateCursedEnergy(atk, def, jp);
     }
 
+    cout << "Phan bo chu luc hien tai : \n";
+    cout << format("[ATTACK] : {} => buff them 10% damage gay ra cho moi diem chu luc\n", m_current->attackEnergy);
+    cout << format("[DEFENSE] : {} => giam di 10% damage nhan vao cho moi diem chu luc\n", m_current->defenseEnergy);
+    cout << format("[JACKPOT] : {} => tang 1 diem no II cho moi diem chu luc\n\n", m_current->jackpotEnergy);
+
     cout << " ===> Cac la bai trong tay:" << endl;
     for (int i = 0; i < m_hand.size(); ++i)
         cout << i + 1 << ". " << m_hand[i]->name << endl;
@@ -108,19 +120,19 @@ void StateNewGame::Handle() {
     vector<int> picks(4);
     for (int& x : picks) cin >> x;
 
+    cout << "=====================================\n\n";
+
     for (int idx : picks) {
         if (idx < 1 || idx > m_hand.size()) continue;
-        m_hand[idx - 1]->execute(*m_current, *m_opponent);
+        m_hand[idx - 1]->execute(*m_current, *m_opponent, *this);
     }
 
-	// ===== CAP NHAT TRANG THAI CUOI LUOT =====
-    m_current->updateEffectsEndTurn();
+    battle->onTurnEnd(*m_current);
 
     processEndOfTurn();
 
     if (!m_isGameOver) {
-        swapTurns();
-        drawHand();
+        endTurn();
     }
 }
 
@@ -133,3 +145,5 @@ void StateNewGame::Render() {
 void StateNewGame::Exit() {
     cout << "Thoat khoi StateNewGame." << endl;
 }
+
+

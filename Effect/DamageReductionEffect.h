@@ -8,10 +8,12 @@ public:
     DamageReductionEffect(int turns, float r)
         : StatusEffect(turns), ratio(r) {}
 
-    void onAfterReceiveDamage(Player&, int& damage) override {
-        int reduced = static_cast<int>(damage * ratio);
-        damage -= reduced;
-        std::cout << "[REDUCE] Giam " << ratio * 100 << "% sat thuong\n";
+    void onApply(Player&, Damage* damage = nullptr) override {
+        if(damage) {
+            int reduced = static_cast<int>((damage->amount) * ratio);
+            damage->amount -= reduced;
+            std::cout << "[REDUCE] Doi thu giam " << ratio * 100 << "% sat thuong\n";
+        }
     }
 
     bool hasTag(EffectTag tag) override {

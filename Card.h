@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+class StateNewGame;
 
 using namespace std;
 
@@ -59,7 +60,7 @@ public:
      * Mỗi lá bài con sẽ override hàm này
      * để xử lý logic riêng và in thông báo ra console.
      */
-    virtual void execute(class Player& self, class Player& target) = 0;
+    virtual void execute(class Player& self, class Player& target, StateNewGame& stateNewGame) = 0;
 
     /**
      * @brief In mô tả ngắn gọn lá bài ra console.

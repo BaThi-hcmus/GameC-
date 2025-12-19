@@ -2,6 +2,8 @@
 #include "State.h"
 #include "Player.h"
 #include "Deck.h"
+#include "Effect/EffectScheduler.h"
+class BattleSystem;
 #include <vector>
 #include <memory>
 
@@ -22,10 +24,16 @@ private:
 
     void swapTurns();			// đổi người chơi
     void drawHand();          // rút 6 lá
+    void endTurn();
     void processEndOfTurn();  // xử lý độc, kiểm tra chết
 
 public:
+    // quản lí tấc cả hiệu ứng
+    EffectScheduler scheduler;
+    BattleSystem* battle;
+
     StateNewGame();
+        
     ~StateNewGame() override = default;
 
     void Init() override;

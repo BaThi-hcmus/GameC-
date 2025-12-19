@@ -8,10 +8,12 @@ public:
     DodgeEffect(int turns, float c)
         : StatusEffect(turns), chance(c) {}
 
-    void onBeforeReceiveDamage(Player&, int& damage) override {
-        if (rand() % 100 < chance * 100) {
-            std::cout << "[DODGE] Ne don thanh cong!\n";
-            damage = 0;
+    void onApply(Player&, Damage* damage = nullptr) override {
+        if(damage) {
+            if (rand() % 100 < chance * 100) {
+                std::cout << "[DODGE] Doi thu ne don thanh cong!\n";         
+                damage->amount = 0;
+            }
         }
     }
 

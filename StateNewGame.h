@@ -1,37 +1,43 @@
 #pragma once
 #include "State.h"
-#include "Player.h"
-#include "Deck.h"
+#include "Player/Player.h"
+#include "Deck/Deck.h"
 #include "Effect/EffectScheduler.h"
-class BattleSystem;
+
 #include <vector>
 #include <memory>
 
+class BattleSystem;
+
+using namespace std;
+
 class StateNewGame : public State {
 private:
-    std::unique_ptr<Player> m_player1;
-    std::unique_ptr<Player> m_player2;
-    std::unique_ptr<Deck>   m_deck;
+    // quản lí tấc cả hiệu ứng
+    EffectScheduler _scheduler;
+    BattleSystem* _battle;
+
+    unique_ptr<Player> _player1;
+    unique_ptr<Player> _player2;
+    unique_ptr<Deck>   _deck;
 
     // 6 lá rút mỗi lượt
-    std::vector<std::unique_ptr<Card>> m_hand;
+    vector<unique_ptr<Card>> _hand;
 
-    Player* m_current;
-    Player* m_opponent;
+    Player* _current;
+    Player* _opponent;
 
-    bool m_isGameOver = false;
-    int  m_turnCount = 1;
+    bool _isGameOver = false;
+    int  _turnCount = 1;
 
     void swapTurns();			// đổi người chơi
     void drawHand();          // rút 6 lá
     void endTurn();
     void processEndOfTurn();  // xử lý độc, kiểm tra chết
-
 public:
-    // quản lí tấc cả hiệu ứng
-    EffectScheduler scheduler;
-    BattleSystem* battle;
-
+    EffectScheduler& getScheduler();
+    BattleSystem* getBattle();
+public:
     StateNewGame();
         
     ~StateNewGame() override = default;

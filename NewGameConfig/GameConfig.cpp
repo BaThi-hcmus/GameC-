@@ -8,22 +8,22 @@ GameConfig& GameConfig::instance() {
     return inst;
 }
 
-void GameConfig::loadFromFile(const std::string& path) {
-    std::ifstream file(path);
+void GameConfig::loadFromFile(const string& path) {
+    ifstream file(path);
     if (!file.is_open()) {
-        std::cerr << "Khong the mo file config: " << path << '\n';
+        cerr << "Khong the mo file config: " << path << '\n';
         return;
     }
 
-    std::string line;
-    while (std::getline(file, line)) {
+    string line;
+    while (getline(file, line)) {
         if (line.empty() || line[0] == '#') continue;
 
         auto pos = line.find('=');
-        if (pos == std::string::npos) continue;
+        if (pos == string::npos) continue;
 
-        std::string key = line.substr(0, pos);
-        std::string value = line.substr(pos + 1);
+        string key = line.substr(0, pos);
+        string value = line.substr(pos + 1);
 
         m_values[key] = value;
     }
@@ -31,10 +31,10 @@ void GameConfig::loadFromFile(const std::string& path) {
 
 int GameConfig::getInt(ConfigKey key) const {
     const auto& strKey = ConfigKeyToString.at(key);
-    return std::stoi(m_values.at(strKey));
+    return stoi(m_values.at(strKey));
 }
 
 float GameConfig::getFloat(ConfigKey key) const {
     const auto& strKey = ConfigKeyToString.at(key);
-    return std::stof(m_values.at(strKey));
+    return stof(m_values.at(strKey));
 }

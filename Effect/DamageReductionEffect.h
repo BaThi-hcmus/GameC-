@@ -2,17 +2,18 @@
 #include "StatusEffect.h"
 
 class DamageReductionEffect : public StatusEffect {
-    float ratio;
+private:
+    float _ratio;
 
 public:
     DamageReductionEffect(int turns, float r)
-        : StatusEffect(turns), ratio(r) {}
+        : StatusEffect(turns), _ratio(r) {}
 
     void onApply(Player&, Damage* damage = nullptr) override {
         if(damage) {
-            int reduced = static_cast<int>((damage->amount) * ratio);
-            damage->amount -= reduced;
-            std::cout << "[REDUCE] Doi thu giam " << ratio * 100 << "% sat thuong\n";
+            int reduced = static_cast<int>((damage->getAmount()) * _ratio);
+            damage->setAmount(damage->getAmount() - reduced);
+            cout << "[REDUCE] Doi thu giam " << _ratio * 100 << "% sat thuong\n";
         }
     }
 

@@ -6,16 +6,25 @@ class Player;
 #include <memory>
 
 class EffectScheduler {
+private:
+    vector<ScheduledEffect> _scheduledEffects;
 public:
-    std::vector<ScheduledEffect> scheduledEffects;
+    vector<ScheduledEffect>& getScheduledEffects() {
+        return _scheduledEffects;
+    }
 
-    void addEffect(Player* target, std::unique_ptr<StatusEffect> eff, TriggerType trigger, int duration) {
-        scheduledEffects.push_back({target, std::move(eff), trigger, duration});
+    void setScheduledEffects(ScheduledEffect scheduledEffect) {
+        _scheduledEffects.push_back(move(scheduledEffect));
+    }
+public:
+    void addEffect(Player* target, unique_ptr<StatusEffect> eff, TriggerType trigger, int duration) {
+        //_scheduledEffects.push_back({target, move(eff), trigger, duration});
+        setScheduledEffects({target, move(eff), trigger, duration});
     }
 
     // gọi khi event xảy ra
     void processTrigger(TriggerType trigger, Player& currentPlayer, Damage* damage = nullptr) {
-        for (auto it = scheduledEffects.begin(); it != scheduledEffects.end();) {
+        for (auto it = _scheduledEffects.begin(); it != _scheduledEffects.end();) {
             if (it->trigger == trigger && it->target == &currentPlayer) {
                 it->effect->onApply(*it->target, damage); // effect tự định nghĩa hành vi
             }
@@ -24,7 +33,7 @@ public:
     }
 
     bool hasEffect(Player* target, EffectTag tag) {
-        for (const auto& se : scheduledEffects) {
+        for (const auto& se : _scheduledEffects) {
             if (se.target == target && se.effect->hasTag(tag)) {
                 return true;
             }
@@ -33,12 +42,12 @@ public:
     }
 
     void tickPlayer(Player& p) {
-        for (auto it = scheduledEffects.begin(); it != scheduledEffects.end(); ) {
+        for (auto it = _scheduledEffects.begin(); it != _scheduledEffects.end(); ) {
             if (it->target == &p) {
                 it->effect->tick();
 
                 if (it->effect->isExpired()) {
-                    it = scheduledEffects.erase(it);
+                    it = _scheduledEffects.erase(it);
                     continue;
                 }
             }

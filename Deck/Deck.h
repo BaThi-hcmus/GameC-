@@ -1,6 +1,14 @@
 #pragma once
-#include "ConcreteCards.h"
-#include "GameConfig.h"
+#include "../Card/DamageCard.h"
+#include "../Card/StunAttackCard.h"
+#include "../Card/PierceAttackCard.h"
+#include "../Card/DodgeCard.h"
+#include "../Card/ReduceDamageCard.h"
+#include "../Card/ShieldCard.h"
+#include "../Card/RageIncreaseCard.h"
+#include "../Card/JackpotRollCard.h"
+#include "../Card/DoubleJackpotRollCard.h"
+#include "../NewGameConfig/GameConfig.h"
 
 #include <vector>
 #include <memory>
@@ -20,7 +28,7 @@ private:
      * @brief Danh sách các lá bài hiện có trong Deck.
      * Sử dụng unique_ptr để quản lý vòng đời Card an toàn.
      */
-    vector<unique_ptr<Card>> m_Deck;
+    vector<unique_ptr<Card>> _Deck;
 
     /**
      * @brief Tổng số lá bài chuẩn trong Deck.
@@ -59,5 +67,5 @@ public:
     /**
      * @brief Lấy số lượng bài hiện tại trong Deck.
      */
-    int size() const { return static_cast<int>(m_Deck.size()); }
+    int size() const { return static_cast<int>(_Deck.size()); }
 };

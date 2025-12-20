@@ -14,7 +14,7 @@ enum class TriggerType {
 
 struct ScheduledEffect {
     Player* target;     // hiệu ứng tác động vào ai
-    std::unique_ptr<StatusEffect> effect;   
+    unique_ptr<StatusEffect> effect;   
     TriggerType trigger;    // tác động vào thời điểm nào 
     int remainingTurns; // số lượt còn lại
 };

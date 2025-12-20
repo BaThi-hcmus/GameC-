@@ -1,17 +1,17 @@
 #pragma once
 #include "Damage.h"
-#include "../Player.h"
+#include "../Player/Player.h"
 
 class NormalDamage : public Damage {
 public:
     void apply(Player& target) override {
-        int dmgLeft = amount;
-        if (target.shield > 0) {
-            int absorbed = std::min(dmgLeft, target.shield);
-            target.shield -= absorbed;
+        int dmgLeft = _amount;
+        if (target.getShield() > 0) {
+            int absorbed = min(dmgLeft, target.getShield());
+            target.setShield(target.getShield() - absorbed);
             dmgLeft -= absorbed;
         }
-        target.hp -= dmgLeft;
+        target.setHp(target.getHp() - dmgLeft);
     }
 };
 

@@ -1,6 +1,8 @@
 // ConfigKey.h
 #pragma once
 
+using namespace std;
+
 enum class ConfigKey {
     // === CARD ===
     CARD_DAMAGE_NORMAL,

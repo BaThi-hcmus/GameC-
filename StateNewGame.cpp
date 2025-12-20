@@ -1,86 +1,93 @@
 #include "StateNewGame.h"
 #include "StateManager.h"
-#include "GameConfig.h"
-#include "BattleSystem.h"
+#include "NewGameConfig/GameConfig.h"
+#include "BattleSystem/BattleSystem.h"
+
 #include <format>
 #include <iostream>
 
-using namespace std;
+EffectScheduler& StateNewGame::getScheduler() {
+    return _scheduler;
+}
+
+BattleSystem* StateNewGame::getBattle() {
+    return _battle;
+}
 
 StateNewGame::StateNewGame() {
-    battle = new BattleSystem(scheduler);
+    _battle = new BattleSystem(_scheduler);
 }
 
 void StateNewGame::Init() {
     cout << "\n===== BAT DAU TRAN DAU=====" << endl;
 
 	// Load cấu hình game
-	GameConfig::instance().loadFromFile("game_config.txt");
+	GameConfig::instance().loadFromFile("NewGameConfig/game_config.txt");
 	Player::loadConfig();
 
-    m_player1 = make_unique<Player>();
-    m_player2 = make_unique<Player>();
-    m_deck    = make_unique<Deck>();
+    _player1 = make_unique<Player>();
+    _player2 = make_unique<Player>();
+    _deck    = make_unique<Deck>();
 
-    m_current  = m_player1.get();
-    m_opponent = m_player2.get();
+    _current  = _player1.get();
+    _opponent = _player2.get();
 }
 
 // hàm rút 6 lá bài mỗi lượt
 void StateNewGame::drawHand() {
     cout << "\n[DECK] rut 6 la tu bo bai : \n";
 
-    m_hand.clear();
-    while (m_hand.size() < 6) {
-        auto c = m_deck->drawCard(); //rút 1 lá ngẫu nhiên từ deck
+    _hand.clear();
+    while (_hand.size() < 6) {
+        auto c = _deck->drawCard(); //rút 1 lá ngẫu nhiên từ deck
         if (!c) {
-            m_deck->checkAndRefillDeck();
+            _deck->checkAndRefillDeck();
             continue;
         }
-        m_hand.push_back(move(c));
+        _hand.push_back(move(c));
     }
 }
 
 void StateNewGame::swapTurns() {
-    std::swap(m_current, m_opponent);
-    m_turnCount++;
+    swap(_current, _opponent);
+    _turnCount++;
 }
 
 void StateNewGame::endTurn() {
-    scheduler.tickPlayer(*m_current);   // giảm duration, xóa effect hết hạn
+    _scheduler.tickPlayer(*_current);   // giảm duration, xóa effect hết hạn
     swapTurns();
 }
 
 
 void StateNewGame::processEndOfTurn() {
-    if (m_current->hp <= 0 || m_opponent->hp <= 0)
-        m_isGameOver = true;
+    if (_current->getHp() <= 0 || _opponent->getHp() <= 0)
+        _isGameOver = true;
 }
 
 void StateNewGame::Handle() {
-    if (m_isGameOver) {
+    if (_isGameOver) {
         cout << "=======TRAN DAU KET THUC!==========" << endl;
         StateManager::getInstance()->ChangeState(0);
         return;
     }
 
-    cout << "\n=== LUOT " << m_turnCount
+    cout << "\n=== LUOT " << _turnCount
          << " | HAKARI "
-         << (m_current == m_player1.get() ? "P1" : "P2")
+         << (_current == _player1.get() ? "P1" : "P2")
          << " ===" << endl;
 
 	// ===== RESET TRANG THAI LUOT =====
-    m_current->resetTurnState();
+    _current->resetTurnState();
 
     // xử lí choáng 
-    if (scheduler.hasEffect(m_current, EffectTag::Stun)) {
+    if (_scheduler.hasEffect(_current, EffectTag::Stun)) {
         cout << "[CHOANG] Ban bi mat luot!\n\n";
 
         // Hiệu ứng cuối lượt vẫn chạy nếu có (như đốt, độc,...)
-        battle->onTurnEnd(*m_current);
+        _battle->onTurnEnd(*_current);
 
         processEndOfTurn();
-        if (m_isGameOver)
+        if (_isGameOver)
             return;
 
         endTurn();
@@ -90,10 +97,10 @@ void StateNewGame::Handle() {
     drawHand();
 
     //kích hoạt các hiệu ứng đầu lượt : jackpot
-    battle->onTurnStart(*m_current);
+    _battle->onTurnStart(*_current);
 
     //nếu ko có hiệu ứng jackpot thì mới cho phép chủ động phân bố chú lực
-    if(!scheduler.hasEffect(m_current, EffectTag::Jackpot)) {
+    if(!_scheduler.hasEffect(_current, EffectTag::Jackpot)) {
         // ===== PHAN BO CHU LUC =====
         int atk, def, jp;
         cout << "\nPhan bo 5 diem chu luc (Tan cong / Phong thu / Jackpot): ";
@@ -103,17 +110,17 @@ void StateNewGame::Handle() {
             cout << "Tong phai bang 5, nhap lai: ";
             cin >> atk >> def >> jp;
         }
-        m_current->allocateCursedEnergy(atk, def, jp);
+        _current->allocateCursedEnergy(atk, def, jp);
     }
 
     cout << "Phan bo chu luc hien tai : \n";
-    cout << format("[ATTACK] : {} => buff them 10% damage gay ra cho moi diem chu luc\n", m_current->attackEnergy);
-    cout << format("[DEFENSE] : {} => giam di 10% damage nhan vao cho moi diem chu luc\n", m_current->defenseEnergy);
-    cout << format("[JACKPOT] : {} => tang 1 diem no II cho moi diem chu luc\n\n", m_current->jackpotEnergy);
+    cout << format("[ATTACK] : {} => buff them 10% damage gay ra cho moi diem chu luc\n", _current->getAttackEnergy());
+    cout << format("[DEFENSE] : {} => giam di 10% damage nhan vao cho moi diem chu luc\n", _current->getDefenseEnergy());
+    cout << format("[JACKPOT] : {} => tang 1 diem no II cho moi diem chu luc\n\n", _current->getJackpotEnergy());
 
     cout << " ===> Cac la bai trong tay:" << endl;
-    for (int i = 0; i < m_hand.size(); ++i)
-        cout << i + 1 << ". " << m_hand[i]->name << endl;
+    for (int i = 0; i < _hand.size(); ++i)
+        cout << i + 1 << ". " << _hand[i]->_name << endl;
 
     cout << "Chon 4 la bai (nhap 4 so): ";
 
@@ -123,23 +130,23 @@ void StateNewGame::Handle() {
     cout << "=====================================\n\n";
 
     for (int idx : picks) {
-        if (idx < 1 || idx > m_hand.size()) continue;
-        m_hand[idx - 1]->execute(*m_current, *m_opponent, *this);
+        if (idx < 1 || idx > _hand.size()) continue;
+        _hand[idx - 1]->execute(*_current, *_opponent, *this);
     }
 
-    battle->onTurnEnd(*m_current);
+    _battle->onTurnEnd(*_current);
 
     processEndOfTurn();
 
-    if (!m_isGameOver) {
+    if (!_isGameOver) {
         endTurn();
     }
 }
 
 void StateNewGame::Render() {
     cout << "\n--- TRANG THAI ---" << endl;
-    cout << "P1 HP: " << m_player1->hp << " | P1 RAGE: " << m_player1->rage << " | P1 SHIELD: " << m_player1->shield << endl;
-    cout << "P2 HP: " << m_player2->hp << " | P2 RAGE: " << m_player2->rage << " | P2 SHIELD: " << m_player2->shield << endl;
+    cout << "P1 HP: " << _player1->getHp() << " | P1 RAGE: " << _player1->getRage() << " | P1 SHIELD: " << _player1->getShield() << endl;
+    cout << "P2 HP: " << _player2->getHp() << " | P2 RAGE: " << _player2->getRage() << " | P2 SHIELD: " << _player2->getShield() << endl;
 }
 
 void StateNewGame::Exit() {

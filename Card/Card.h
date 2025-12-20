@@ -1,12 +1,9 @@
 #pragma once
 #include <string>
+
 class StateNewGame;
 
 using namespace std;
-
-// =======================
-// PHÂN LOẠI THẺ BÀI
-// =======================
 
 /**
  * @brief Enum định nghĩa nhóm thẻ bài trong game Hakari.
@@ -31,13 +28,13 @@ public:
      * @brief Tên lá bài (hiển thị trên console).
      * Ví dụ: "Đấm chí mạng", "Phòng thủ tuyệt đối", "Quay Jackpot"
      */
-    string name;
+    string _name;
 
     /**
      * @brief Nhóm thẻ bài (Damage / Defense / Effect).
      * Dùng để hiển thị và debug logic lượt chơi.
      */
-    CardCategory category;
+    CardCategory _category;
 
     /**
      * @brief Constructor khởi tạo lá bài.
@@ -45,7 +42,7 @@ public:
      * @param category Nhóm lá bài
      */
     Card(const string& name, CardCategory category)
-        : name(name), category(category) {}
+        : _name(name), _category(category) {}
 
     /**
      * @brief Destructor ảo để đảm bảo giải phóng đúng bộ nhớ

@@ -15,7 +15,7 @@ Deck::Deck() {
     initializeFullDeck(); // Tạo bộ bài đầy đủ
     shuffle(); // Xáo trộn bộ bài
 
-    cout << format("[DECK] Khoi tao bo bai voi {} la bai.", m_Deck.size()) << endl;
+    cout << format("[DECK] Khoi tao bo bai voi {} la bai.", _Deck.size()) << endl;
 }
 
 /**
@@ -23,41 +23,41 @@ Deck::Deck() {
  */
 void Deck::initializeFullDeck() {
     //Xóa hết bài cũ
-    m_Deck.clear();
+    _Deck.clear();
 
     // ================== DAMAGE ==================
     for (int i = 0; i < 6; ++i)
-        m_Deck.push_back(make_unique<DamageCard>());
+        _Deck.push_back(make_unique<DamageCard>());
 
     for (int i = 0; i < 4; ++i)
-        m_Deck.push_back(make_unique<StunAttackCard>());
+        _Deck.push_back(make_unique<StunAttackCard>());
 
     for (int i = 0; i < 4; ++i)
-        m_Deck.push_back(make_unique<PierceAttackCard>());
+        _Deck.push_back(make_unique<PierceAttackCard>());
 
     // ================== DEFENSE =================
     for (int i = 0; i < 4; ++i)
-        m_Deck.push_back(make_unique<ShieldCard_50>());
+        _Deck.push_back(make_unique<ShieldCard>());
 
     for (int i = 0; i < 3; ++i)
-        m_Deck.push_back(make_unique<ReduceDamageCard>());
+        _Deck.push_back(make_unique<ReduceDamageCard>());
 
     for (int i = 0; i < 3; ++i)
-        m_Deck.push_back(make_unique<DodgeCard>());
+        _Deck.push_back(make_unique<DodgeCard>());
 
     // ================== EFFECT ==================
     for (int i = 0; i < 2; ++i)
-        m_Deck.push_back(make_unique<RageIncreaseCard>());
+        _Deck.push_back(make_unique<RageIncreaseCard>());
     for (int i = 0; i < 2; ++i)
-        m_Deck.push_back(make_unique<JackpotRollCard>());
+        _Deck.push_back(make_unique<JackpotRollCard>());
 
     for (int i = 0; i < 2; ++i)
-        m_Deck.push_back(make_unique<DoubleJackpotRollCard>());
+        _Deck.push_back(make_unique<DoubleJackpotRollCard>());
 
     // ================== CHECK ===================
-    if (m_Deck.size() != INITIAL_DECK_SIZE) {
+    if (_Deck.size() != INITIAL_DECK_SIZE) {
         cout << format("[ERROR] Deck size sai! Hien tai = {}, can = {}", 
-        m_Deck.size(), INITIAL_DECK_SIZE) << endl;
+        _Deck.size(), INITIAL_DECK_SIZE) << endl;
     }
 }
 
@@ -71,7 +71,7 @@ void Deck::shuffle() {
     std::default_random_engine engine(seed);
 
     // Sử dụng std::shuffle để xáo trộn
-    std::shuffle(m_Deck.begin(), m_Deck.end(), engine);
+    std::shuffle(_Deck.begin(), _Deck.end(), engine);
 
     cout << "[DECK] Da xao tron bo bai." << endl;
 }
@@ -81,16 +81,16 @@ void Deck::shuffle() {
  * @brief Rút 1 lá bài ngẫu nhiên.
  */
 unique_ptr<Card> Deck::drawCard() {
-    if (m_Deck.empty()) {
+    if (_Deck.empty()) {
         cout << "[DECK] Het bai!" << endl;
         return nullptr;
     }
 
-    int index = rand() % m_Deck.size();
-    unique_ptr<Card> card = move(m_Deck[index]);
-    m_Deck.erase(m_Deck.begin() + index);
+    int index = rand() % _Deck.size();
+    unique_ptr<Card> card = move(_Deck[index]);
+    _Deck.erase(_Deck.begin() + index);
 
-    cout << "[DECK] Rut duoc la bai: " << card->name << endl;
+    cout << "[DECK] Rut duoc la bai: " << card->_name << endl;
     return card;
 }
 
@@ -98,9 +98,9 @@ unique_ptr<Card> Deck::drawCard() {
  * @brief Refill Deck nếu bài gần hết.
  */
 void Deck::checkAndRefillDeck(int threshold) {
-    if (m_Deck.size() <= threshold) {
+    if (_Deck.size() <= threshold) {
         cout << "\n========== REFILL DECK ==========" << endl;
-        cout << format("Deck con {} la bai. Dang bo sung...", m_Deck.size()) << endl;
+        cout << format("Deck con {} la bai. Dang bo sung...", _Deck.size()) << endl;
 
         initializeFullDeck(); // bổ sung lại bộ bài
         shuffle(); // xáo trộn lại

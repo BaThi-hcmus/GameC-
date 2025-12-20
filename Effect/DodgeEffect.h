@@ -2,17 +2,18 @@
 #include "StatusEffect.h"
 
 class DodgeEffect : public StatusEffect {
-    float chance;
+private:
+    float _chance;
 
 public:
     DodgeEffect(int turns, float c)
-        : StatusEffect(turns), chance(c) {}
+        : StatusEffect(turns), _chance(c) {}
 
     void onApply(Player&, Damage* damage = nullptr) override {
         if(damage) {
-            if (rand() % 100 < chance * 100) {
-                std::cout << "[DODGE] Doi thu ne don thanh cong!\n";         
-                damage->amount = 0;
+            if (rand() % 100 < _chance * 100) {
+                cout << "[DODGE] Doi thu ne don thanh cong!\n";         
+                damage->setAmount(0);
             }
         }
     }

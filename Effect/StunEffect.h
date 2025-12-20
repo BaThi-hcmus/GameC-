@@ -1,6 +1,6 @@
 #pragma once 
 #include "StatusEffect.h"
-#include "../Player.h"
+#include "../Player/Player.h"
 
 class StunEffect : public StatusEffect {
 public:

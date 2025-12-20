@@ -16,9 +16,9 @@ enum class EffectTag {
 
 class StatusEffect {
 protected:
-    int duration;
+    int _duration;
 public:
-    explicit StatusEffect(int turns) : duration(turns) {}
+    explicit StatusEffect(int turns) : _duration(turns) {}
     virtual ~StatusEffect() = default;
 
     // ===== QUERY =====
@@ -28,10 +28,10 @@ public:
     virtual void onApply(Player&, Damage* dmg = nullptr) {}
 
     virtual void tick() {
-        duration--;
+        _duration--;
     }
 
     bool isExpired() const {
-        return duration <= 0;
+        return _duration <= 0;
     }
 };

@@ -4,7 +4,7 @@
 #include <string>
 #include "ConfigKey.h"
 
-inline const std::unordered_map<ConfigKey, std::string> ConfigKeyToString = {
+inline const unordered_map<ConfigKey, string> ConfigKeyToString = {
     { ConfigKey::CARD_DAMAGE_NORMAL, "CARD_DAMAGE_NORMAL" },
     { ConfigKey::CARD_DAMAGE_PIERCE, "CARD_DAMAGE_PIERCE" },
     { ConfigKey::CARD_DAMAGE_STUN, "CARD_DAMAGE_STUN" },

@@ -3,6 +3,8 @@
 #include <string>
 #include "ConfigKey.h"
 
+using namespace std;
+
 class GameConfig {
 public:
     static GameConfig& instance();

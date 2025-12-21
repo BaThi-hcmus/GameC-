@@ -1,4 +1,4 @@
 biên dịch : 
-g++ --std=c++23 SFLMGame.cpp State.cpp Application.cpp StateManager.cpp StateMenu.cpp Deck.cpp Player.cpp StateNewGame.cpp -o main
+g++ -std=c++23 (Get-ChildItem -Recurse -Filter *.cpp | % FullName) -o app.exe
 
-chạy : ./main
+chạy : ./app

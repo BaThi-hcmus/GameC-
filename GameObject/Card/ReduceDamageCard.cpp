@@ -1,5 +1,5 @@
 #include "ReduceDamageCard.h"
-#include "../StateNewGame.h"
+#include "../../GameState/StateNewGame.h"
 #include "../Effect/DamageReductionEffect.h"
 
 #include <iostream>

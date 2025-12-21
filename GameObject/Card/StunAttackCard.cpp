@@ -1,5 +1,5 @@
 #include "StunAttackCard.h"
-#include "../StateNewGame.h"
+#include "../../GameState/StateNewGame.h"
 #include "../BattleSystem/BattleSystem.h"
 #include "../Effect/StunEffect.h"
 #include "../Damage/NormalDamage.h"

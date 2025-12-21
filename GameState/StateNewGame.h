@@ -1,8 +1,8 @@
 #pragma once
 #include "State.h"
-#include "Player/Player.h"
-#include "Deck/Deck.h"
-#include "Effect/EffectScheduler.h"
+#include "../GameObject/Player/Player.h"
+#include "../GameObject/Deck/Deck.h"
+#include "../GameObject/Effect/EffectScheduler.h"
 
 #include <vector>
 #include <memory>

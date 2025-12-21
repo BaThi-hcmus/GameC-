@@ -1,5 +1,5 @@
 #include "DamageCard.h"
-#include "../StateNewGame.h"
+#include "../../GameState/StateNewGame.h"
 #include "../BattleSystem/BattleSystem.h"
 #include "../Damage/NormalDamage.h"
 

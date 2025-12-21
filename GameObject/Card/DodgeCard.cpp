@@ -1,5 +1,5 @@
 #include "DodgeCard.h"
-#include "../StateNewGame.h"
+#include "../../GameState/StateNewGame.h"
 #include "../Effect/DodgeEffect.h"
 
 #include <iostream>

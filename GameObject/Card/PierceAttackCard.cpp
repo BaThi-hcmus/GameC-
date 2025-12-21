@@ -1,5 +1,5 @@
 #include "PierceAttackCard.h"
-#include "../StateNewGame.h"
+#include "../../GameState/StateNewGame.h"
 #include "../BattleSystem/BattleSystem.h"
 #include "../Damage/PiercingDamage.h"
 

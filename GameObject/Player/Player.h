@@ -4,7 +4,7 @@
 #include "../NewGameConfig/GameConfig.h"
 #include "../Effect/StatusEffect.h"
 #include "../Effect/EffectScheduler.h"
-#include "../StateNewGame.h"
+#include "../../GameState/StateNewGame.h"
 
 using namespace std;
 

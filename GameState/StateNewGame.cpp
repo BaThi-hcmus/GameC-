@@ -1,7 +1,7 @@
 #include "StateNewGame.h"
-#include "StateManager.h"
-#include "NewGameConfig/GameConfig.h"
-#include "BattleSystem/BattleSystem.h"
+#include "../GameManager/StateManager.h"
+#include "../GameObject/NewGameConfig/GameConfig.h"
+#include "../GameObject/BattleSystem/BattleSystem.h"
 
 #include <format>
 #include <iostream>
@@ -22,7 +22,7 @@ void StateNewGame::Init() {
     cout << "\n===== BAT DAU TRAN DAU=====" << endl;
 
 	// Load cấu hình game
-	GameConfig::instance().loadFromFile("NewGameConfig/game_config.txt");
+	GameConfig::instance().loadFromFile("GameObject/NewGameConfig/game_config.txt");
 	Player::loadConfig();
 
     _player1 = make_unique<Player>();

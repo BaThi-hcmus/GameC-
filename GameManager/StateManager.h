@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <stack>
-#include "State.h"
+#include "../GameState/State.h"
 
 using namespace std;
 

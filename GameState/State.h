@@ -1,7 +1,7 @@
 #pragma once
 
 //#include "ResourceManager.h"
-#include "StateManager.h"
+#include "../GameManager/StateManager.h"
 //#include "StepManager.h"
 
 class State {

@@ -22,20 +22,39 @@ public:
             return;
         }
 
-        // nếu được kích hoạt trong lượt thì chỉ áp dụng hồi đầy thanh máu
+        // nếu được kích hoạt trong lượt 
         if(firstApply == true) {
-            cout << "Ban duoc hoi day HP trong luot nay\n";
             firstApply = false;
-            p.setHp(Player::MAX_HP);
+            
+            // CHECK NERF CỦA URAUME
+            if (p.isJackpotNerfed()) {
+                cout << "[URAUME EFFECT] Jackpot bi nguyen rua! Chi hoi 500 HP!\n";
+                int newHp = min(Player::MAX_HP, p.getHp() + 500);
+                p.setHp(newHp);
+            } else {
+                cout << "Ban duoc hoi day HP trong luot nay\n";
+                p.setHp(Player::MAX_HP);
+            }
             return;
         }
 
-        // các lượt buff thực sự
-        p.setHp(Player::MAX_HP);
+        // Buff các lượt sau (Uraume không chặn cái này theo mô tả, chỉ chặn hồi máu)
+        // Nếu muốn chặn cả auto-full HP mỗi lượt thì thêm check ở đây
+        if (p.isJackpotNerfed()) {
+            // Logic nếu bị nerf thì mỗi lượt không hồi full mà chỉ hồi ít hoặc không hồi?
+            // Theo mô tả của bạn: "sau mỗi lượt thanh máu reset về hiện tại + 500"
+            int newHp = min(Player::MAX_HP, p.getHp() + 500);
+            p.setHp(newHp);
+            cout << "[URAUME EFFECT] Jackpot bi nguyen rua! Chi hoi 500 HP moi luot!\n";
+        } else {
+            p.setHp(Player::MAX_HP);
+            cout << "[JACKPOT] Hoi day HP moi luot\n";
+        }
+        
         p.setAttackEnergy(Player::MAX_CURSED_ENERGY);
         p.setDefenseEnergy(0);
         p.setJackpotEnergy(0);
-        cout << "[JACKPOT] Full HP + Auto Attack Energy\n";
+        cout << "[JACKPOT] auto attack energy\n";
     }
 
     bool hasTag(EffectTag tag) override {

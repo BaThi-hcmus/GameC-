@@ -9,7 +9,7 @@
 using namespace std;
 
 class Player {
-private:
+protected :
     // ===== CORE STATS =====
     int _hp;
     int _shield;
@@ -19,6 +19,8 @@ private:
     int _attackEnergy;
     int _defenseEnergy;
     int _jackpotEnergy;
+
+    bool _isJackpotNerfed = false; 
 public:
     int getHp();
     int getShield();
@@ -52,4 +54,7 @@ public:
 
     void addShield(int amount);
     void increaseRage(int amount);
+
+    void setJackpotNerf(bool val);
+    bool isJackpotNerfed() const ;
 };

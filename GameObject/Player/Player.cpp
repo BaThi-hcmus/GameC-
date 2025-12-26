@@ -74,6 +74,14 @@ void Player::setJackpotEnergy(int jackpotEnergy) {
     _jackpotEnergy = jackpotEnergy;
 }
 
+void Player::setJackpotNerf(bool val) {
+    _isJackpotNerfed = val;
+}
+
+bool Player::isJackpotNerfed() const {
+    return _isJackpotNerfed;
+}
+
 // ================= CONFIG =================
 void Player::loadConfig() {
     auto& conf = GameConfig::instance();

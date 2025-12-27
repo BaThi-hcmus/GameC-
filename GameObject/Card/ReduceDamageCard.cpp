@@ -16,8 +16,8 @@ void ReduceDamageCard::execute(Player& self, Player&, StateNewGame& state) {
 
     state.getScheduler().addEffect(
         &self,
-        make_unique<DamageReductionEffect>(_reductionRatio, 1),
-        TriggerType::onAfterReceiveDamage,
+        make_unique<DamageReductionEffect>(1, _reductionRatio, TickTrigger::endOfTurnOpponent),
+        TriggerType::onBeforeReceiveDamage,
         1
     );
 }

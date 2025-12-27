@@ -18,17 +18,76 @@ StateNewGame::StateNewGame() {
     _battle = new BattleSystem(_scheduler);
 }
 
+void StateNewGame::selectGameMode() {
+    int mode = 0;
+    cout << "Chon che do choi:\n";
+    cout << "1. Player vs Player\n";
+    cout << "2. Player vs BOT\n";
+    cout << "Nhap lua chon cua ban ==> ";
+    cin >> mode;
+
+    while(mode < 1 || mode > 2) {
+        cout << "Nhap lai : ";
+        cin >> mode;
+    }
+    
+    switch(mode) {
+        case 1 : 
+            // P1 vs P2 (cả hai là người chơi)
+            _player1 = make_unique<Player>();
+            _player2 = make_unique<Player>();
+            break;
+        case 2 : {
+            // P1 là người, P2 là BOT
+            _player1 = make_unique<Player>();
+
+            cout << "\nChon doi thu:\n";
+            cout << "1. Hakari (May)\n";
+            cout << "2. Charles Bernard (De)\n";
+            cout << "3. Kashimo Hajime (TB)\n";
+            cout << "4. Uraume (Kho)\n";
+            cout << "Nhap lua chon cua ban ==> ";
+
+            int botChoice = 0;
+            cin >> botChoice;
+
+            while(botChoice < 1 || botChoice > 5) {
+                cout << "Nhap lai : ";
+                cin >> botChoice;
+            }
+
+            switch (botChoice) {
+                case 1: _player2 = make_unique<BotHakari>(); break;
+                case 2: _player2 = make_unique<CharlesBoss>(); break;
+                case 3: _player2 = make_unique<KashimoBoss>(); break;
+                case 4: _player2 = make_unique<UraumeBoss>(); break;
+                default:
+                    cout << "Lua chon khong hop le, mac dinh Hakari.\n";
+                    _player2 = make_unique<BotHakari>();
+                    break;
+            }
+            break;
+        }
+        default :
+            cout << "Lua chon khong hop le, mac dinh Player vs Player.\n";
+            _player1 = make_unique<Player>();
+            _player2 = make_unique<Player>();
+    }
+}
+
+
 void StateNewGame::Init() {
+    GameConfig::instance().loadFromFile("GameObject/NewGameConfig/game_config.txt");
+	Player::loadConfig();
+    selectGameMode();
+
+    if (_player2->isBot())
+        cout << "\n[THONG TIN BOSS]: \n" << dynamic_cast<BotPlayer*>(_player2.get())->getInfo() << endl;
+
     cout << "\n===== BAT DAU TRAN DAU=====" << endl;
 
-	// Load cấu hình game
-	GameConfig::instance().loadFromFile("GameObject/NewGameConfig/game_config.txt");
-	Player::loadConfig();
-
-    _player1 = make_unique<Player>();
-    _player2 = make_unique<Player>();
     _deck    = make_unique<Deck>();
-
+  
     _current  = _player1.get();
     _opponent = _player2.get();
 }
@@ -54,7 +113,9 @@ void StateNewGame::swapTurns() {
 }
 
 void StateNewGame::endTurn() {
-    _scheduler.tickPlayer(*_current);   // giảm duration, xóa effect hết hạn
+    _scheduler.tickByTrigger(TickTrigger::endOfTurn, *_current);   // giảm duration, xóa effect hết hạn
+    _scheduler.tickByTrigger(TickTrigger::endOfTurnOpponent, *_opponent); //giảm các hiệu ứng của đối thủ trong lượt này
+    // ví dụ : giảm sát thương, né đòn,...
     swapTurns();
 }
 
@@ -71,13 +132,27 @@ void StateNewGame::Handle() {
         return;
     }
 
-    cout << "\n=== LUOT " << _turnCount
-         << " | HAKARI "
-         << (_current == _player1.get() ? "P1" : "P2")
-         << " ===" << endl;
-
+    cout << "\n=== LUOT " << _turnCount << " | ";
+    if (!_current->isBot() && !_opponent->isBot()) {
+        if (_current == _player1.get()) cout << "PLAYER 1 ===\n";
+        else cout <<"PLAYER 2 ===\n";
+    } else {
+        if (auto bot = dynamic_cast<BotPlayer*>(_current)) {
+            cout << bot->getName() << " ===\n";
+        } else cout << "LUOT CUA BAN ===\n";
+    }
 	// ===== RESET TRANG THAI LUOT =====
     _current->resetTurnState();
+
+    if (auto bot = dynamic_cast<BotPlayer*>(_current)) {
+        bot->onTurnStart();  // BOT : đếm số lượt
+        bot->applyPassiveIfActive(_scheduler); // CharlesBoss => kích hoạt hiệu ứng né đòn (nếu có)
+        if (bot->hasSpecialSkillReady()) { // KashimoBoss => Gây 400 damage xuyên giáp
+            bot->executeSpecialSkill(*_opponent, *_battle);
+        }
+        bot->onOpponentAllocatedEnergy(*_opponent, _scheduler); // UraumeBoss => Kích hoạt đây choáng đối thủ trong lượt kế
+    }
+
 
     // xử lí choáng 
     if (_scheduler.hasEffect(_current, EffectTag::Stun)) {
@@ -102,15 +177,7 @@ void StateNewGame::Handle() {
     //nếu ko có hiệu ứng jackpot thì mới cho phép chủ động phân bố chú lực
     if(!_scheduler.hasEffect(_current, EffectTag::Jackpot)) {
         // ===== PHAN BO CHU LUC =====
-        int atk, def, jp;
-        cout << "\nPhan bo 5 diem chu luc (Tan cong / Phong thu / Jackpot): ";
-        cin >> atk >> def >> jp;
-
-        while (atk + def + jp != Player::MAX_CURSED_ENERGY) {
-            cout << "Tong phai bang 5, nhap lai: ";
-            cin >> atk >> def >> jp;
-        }
-        _current->allocateCursedEnergy(atk, def, jp);
+        _current->allocateCursedEnergy();
     }
 
     cout << "Phan bo chu luc hien tai : \n";
@@ -122,16 +189,12 @@ void StateNewGame::Handle() {
     for (int i = 0; i < _hand.size(); ++i)
         cout << i + 1 << ". " << _hand[i]->_name << endl;
 
-    cout << "Chon 4 la bai (nhap 4 so): ";
+    // gọi hàm chọn bài 
+    auto cardSelected = _current->pickCards(_hand);
 
-    vector<int> picks(4);
-    for (int& x : picks) cin >> x;
-
-    cout << "=====================================\n\n";
-
-    for (int idx : picks) {
-        if (idx < 1 || idx > _hand.size()) continue;
-        _hand[idx - 1]->execute(*_current, *_opponent, *this);
+    //thực thi các lá bài 
+    for (auto c : cardSelected) {
+        c->execute(*_current, *_opponent, *this);
     }
 
     _battle->onTurnEnd(*_current);

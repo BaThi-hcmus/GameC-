@@ -4,7 +4,7 @@
 #include "../NewGameConfig/GameConfig.h"
 #include "../Effect/StatusEffect.h"
 #include "../Effect/EffectScheduler.h"
-#include "../../GameState/StateNewGame.h"
+#include "../Card/Card.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ protected :
     int _defenseEnergy;
     int _jackpotEnergy;
 
-    bool _isJackpotNerfed = false; 
+    bool _isJackpotNerfed; //BOT
 public:
     int getHp();
     int getShield();
@@ -50,11 +50,14 @@ public:
     void resetTurnState();
 
     // ===== GAMEPLAY =====
-    void allocateCursedEnergy(int atk, int def, int jackpot);
+    virtual void allocateCursedEnergy();
+    virtual vector<Card*> pickCards(const vector<unique_ptr<Card>>& hand);
 
     void addShield(int amount);
     void increaseRage(int amount);
 
-    void setJackpotNerf(bool val);
-    bool isJackpotNerfed() const ;
+    void setJackpotNerf(bool val); //BOT
+    bool isJackpotNerfed() const ; //BOT
+    virtual bool isBot() const { return false; } //BOT
+    virtual string getName() const { return "Nguoi Choi"; } //BOT
 };

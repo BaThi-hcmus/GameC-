@@ -55,4 +55,22 @@ public:
         }
     }
 
+    void tickByTrigger(TickTrigger trigger, Player& target) {
+        for (auto it = _scheduledEffects.begin(); it != _scheduledEffects.end();) {
+            // Kiểm tra trigger và target
+            if (it->effect->getTickTrigger() == trigger && it->target == &target) {
+                it->effect->tick();
+            }
+
+            // Xóa nếu hết duration
+            if (it->effect->isExpired()) {
+                it = _scheduledEffects.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+
+
 };

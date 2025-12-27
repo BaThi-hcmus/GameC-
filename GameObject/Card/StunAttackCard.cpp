@@ -22,7 +22,7 @@ void StunAttackCard::execute(Player& self, Player& target, StateNewGame& state) 
 
     state.getScheduler().addEffect(
         &target,
-        make_unique<StunEffect>(1),
+        make_unique<StunEffect>(1, TickTrigger::endOfTurn),
         TriggerType::onTurnStart,
         1
     );

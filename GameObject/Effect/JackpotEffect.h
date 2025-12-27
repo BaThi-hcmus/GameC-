@@ -9,8 +9,8 @@ private:
     int _buffTurns;  // số lượt có buff thật sự : 5, duration = 5 + 1 = 6
     bool firstApply = true;      
 public:
-    JackpotEffect(int buffTurns)
-        : StatusEffect(buffTurns + 1), // +1 lượt cooldown
+    JackpotEffect(int buffTurns, TickTrigger trigger)
+        : StatusEffect(buffTurns + 1, trigger), // +1 lượt cooldown
           _buffTurns(buffTurns) {}
 
     void onApply(Player& p, Damage* dmg = nullptr) override {

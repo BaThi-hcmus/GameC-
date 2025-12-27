@@ -4,7 +4,7 @@
 
 class StunEffect : public StatusEffect {
 public:
-    StunEffect(int turns) : StatusEffect(turns) {}
+    StunEffect(int turns, TickTrigger trigger) : StatusEffect(turns, trigger) {}
 
     bool hasTag(EffectTag tag) override {
         return tag == EffectTag::Stun;

@@ -16,7 +16,7 @@ void DodgeCard::execute(Player& self, Player&, StateNewGame& state) {
 
     state.getScheduler().addEffect(
         &self,
-        make_unique<DodgeEffect>(_dodgeChance, 1),
+        make_unique<DodgeEffect>(1, _dodgeChance, TickTrigger::endOfTurnOpponent),
         TriggerType::onBeforeReceiveDamage,
         1
     );

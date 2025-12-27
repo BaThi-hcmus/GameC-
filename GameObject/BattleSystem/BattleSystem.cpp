@@ -14,7 +14,7 @@ int BattleSystem::computeAttackDamage(Player& attacker, int baseDamage) {
 
         _scheduler.addEffect(
             &attacker,
-            make_unique<CriticalStrikeEffect>(1, chance, multiplier),
+            make_unique<CriticalStrikeEffect>(1, chance, multiplier, TickTrigger::endOfTurn),
             TriggerType::onBeforeDealDamage,
             1
         );
@@ -36,7 +36,7 @@ void BattleSystem::attack(Player& attacker, Player& defender, Damage& damage) {
     // BEFORE DEAL
     _scheduler.processTrigger(TriggerType::onBeforeDealDamage, attacker, &damage);
 
-    // BEFORE RECEIVE
+    // BEFORE RECEIVE (ví dụ hiệu ứng dodge)
     _scheduler.processTrigger(TriggerType::onBeforeReceiveDamage, defender, &damage);
 
     // defense energy
@@ -91,7 +91,7 @@ void BattleSystem::activateJackpot(Player& roller, Player& target) {
         GameConfig::instance().getInt(ConfigKey::JACKPOT_DURATION_TURNS);
 
     // buff cho bản thân
-    auto jackpot = make_unique<JackpotEffect>(buffTurns);
+    auto jackpot = make_unique<JackpotEffect>(buffTurns, TickTrigger::endOfTurn);
 
     //kích hoạt hiệu ứng jackpot ngay trong lượt hiện tại
     jackpot->onApply(roller);
@@ -105,7 +105,7 @@ void BattleSystem::activateJackpot(Player& roller, Player& target) {
     // choáng đối thủ
     _scheduler.addEffect(
         &target,
-        make_unique<StunEffect>(1),
+        make_unique<StunEffect>(1, TickTrigger::endOfTurn),
         TriggerType::onTurnStart,
         1
     );

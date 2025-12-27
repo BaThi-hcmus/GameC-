@@ -24,7 +24,8 @@ Player::Player()
       _rage(0),
       _attackEnergy(0),
       _defenseEnergy(0),
-      _jackpotEnergy(0) {}
+      _jackpotEnergy(0),
+      _isJackpotNerfed(false) {}
 
 int Player::getHp() {
     return _hp;
@@ -98,18 +99,38 @@ void Player::resetTurnState() {
 }
 
 // ================= ENERGY =================
-void Player::allocateCursedEnergy(int atk, int def, int jackpot) {
-    if (atk + def + jackpot != MAX_CURSED_ENERGY) {
-        cout << "Tong chu luc khong hop le!\n";
-        return;
+void Player::allocateCursedEnergy() {
+    int atk, def, jp;
+    cout << "\nPhan bo 5 diem chu luc (Tan cong / Phong thu / Jackpot): ";
+    cin >> atk >> def >> jp;
+
+    while (atk + def + jp != Player::MAX_CURSED_ENERGY) {
+        cout << "Tong phai bang 5, nhap lai: ";
+        cin >> atk >> def >> jp;
     }
 
     _attackEnergy = atk;
     _defenseEnergy = def;
-    _jackpotEnergy = jackpot;
+    _jackpotEnergy = jp;
     // mỗi điểm phân bố cho jackpot sẽ cộng thêm vào cho thanh nộ II
-    if (jackpot > 0)
-        this->increaseRage(jackpot);
+    if (jp > 0)
+        this->increaseRage(jp);
+}
+
+vector<Card*> Player::pickCards(const vector<unique_ptr<Card>>& hand) {
+    vector<Card*> selected;
+    cout << "Chon 4 la bai (nhap 4 so): ";
+
+    vector<int> picks(4);
+    for (int& x : picks) cin >> x;
+
+    cout << "=====================================\n\n";
+
+    for (int idx : picks) {
+        if (idx < 1 || idx > hand.size()) continue;
+        selected.push_back(hand[idx - 1].get());
+    }
+    return selected;
 }
 
 // ================= SHIELD =================

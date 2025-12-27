@@ -6,6 +6,14 @@ using namespace std;
 
 class Player; 
 
+enum class TickTrigger {
+    none,
+    endOfTurn,
+    afterReceiveDamage,
+    beforeReceiveDamage,
+    endOfTurnOpponent
+};
+
 enum class EffectTag {
     Jackpot,
     Stun,
@@ -17,9 +25,18 @@ enum class EffectTag {
 class StatusEffect {
 protected:
     int _duration;
+    TickTrigger _tickTrigger; // thời điểm giảm duration
+
 public:
-    explicit StatusEffect(int turns) : _duration(turns) {}
+    explicit StatusEffect(int turns, TickTrigger tickAt)
+        : _duration(turns), _tickTrigger(tickAt) {}
+
     virtual ~StatusEffect() = default;
+
+public :
+    TickTrigger getTickTrigger() const {
+        return _tickTrigger;
+    }
 
     // ===== QUERY =====
     virtual bool hasTag(EffectTag) { return false; }

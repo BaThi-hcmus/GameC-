@@ -3,6 +3,11 @@
 #include "../GameObject/Player/Player.h"
 #include "../GameObject/Deck/Deck.h"
 #include "../GameObject/Effect/EffectScheduler.h"
+#include "../GameObject/AI/BotPlayer.h"
+#include "../GameObject/AI/BotHakari.h"
+#include "../GameObject/AI/CharlesBoss.h"
+#include "../GameObject/AI/KashimoBoss.h"
+#include "../GameObject/AI/UraumeBoss.h"
 
 #include <vector>
 #include <memory>
@@ -41,6 +46,8 @@ public:
     StateNewGame();
         
     ~StateNewGame() override = default;
+
+    void selectGameMode();
 
     void Init() override;
     void Handle() override;

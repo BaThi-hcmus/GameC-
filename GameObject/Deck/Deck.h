@@ -12,60 +12,50 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_set>
+#include <functional>
 
 using namespace std;
 
-/**
- * @brief Lớp Deck quản lý toàn bộ bộ bài của Hakari.
- * - Chịu trách nhiệm khởi tạo bộ bài gốc
- * - Xáo trộn
- * - Rút bài ngẫu nhiên
- * - Refill khi bài gần hết
- */
+enum class CardType {
+    DAMAGE,
+    PIERCE,
+    STUN_ATTACK,
+
+    SHIELD,
+    DODGE,
+    REDUCE_DAMAGE,
+
+    RAGE_INCREASE,
+    JACKPOT_ROLL,
+    DOUBLE_JACKPOT_ROLL
+};
+
+// cấu trúc mô hả luật sinh bài 
+struct CardEntry {
+    CardType type;                                // Loại logic
+    int weight;                                  // Trọng số (xác suất)
+    function<unique_ptr<Card>()> factory;        // Hàm tạo card
+};
+
 class Deck {
-private:
-    /**
-     * @brief Danh sách các lá bài hiện có trong Deck.
-     * Sử dụng unique_ptr để quản lý vòng đời Card an toàn.
-     */
-    vector<unique_ptr<Card>> _Deck;
-
-    /**
-     * @brief Tổng số lá bài chuẩn trong Deck.
-     * Phải KHỚP với số lượng khởi tạo trong initializeFullDeck().
-     */
-    const int INITIAL_DECK_SIZE = GameConfig::instance().getInt(ConfigKey::DECK_INITIAL_SIZE);
-
-    /**
-     * @brief Tạo lại toàn bộ bộ bài theo luật game.
-     * Hàm này được dùng khi:
-     * - Khởi tạo Deck
-     * - Refill Deck khi gần hết bài
-     */
-    void initializeFullDeck();
-
-public:
+public :
     Deck();
 
-    /**
-     * @brief Xáo trộn thứ tự các lá bài trong Deck.
-     */
-    void shuffle();
+    inline static const int HAND_SIZE = 6;
 
-    /**
-     * @brief Rút 1 lá bài ngẫu nhiên từ Deck.
-     * @return unique_ptr<Card> – lá bài đã rút (nullptr nếu Deck rỗng)
-     */
-    unique_ptr<Card> drawCard();
+    // danh sách các lá bài không được phép xuất hiện hơn 1 lần
+    static const unordered_set<CardType> _noDuplicateTypes;
 
-    /**
-     * @brief Kiểm tra và refill Deck nếu số bài dưới ngưỡng. mắc định dưới 10 lá.
-     * @param threshold Số bài tối thiểu cho phép
-     */
-    void checkAndRefillDeck(int threshold = GameConfig::instance().getInt(ConfigKey::DECK_MIN_SIZE));
+    // các loại bài trong tay hiện tại => check lá bài trùng
+    static unordered_set<CardType> _pickedInHand;
 
-    /**
-     * @brief Lấy số lượng bài hiện tại trong Deck.
-     */
-    int size() const { return static_cast<int>(_Deck.size()); }
+    // danh sách các luật rút bài 
+    static vector<CardEntry> _cardPool;
+
+    // lưu tổng xác suất
+    static int _totalWeight;
+
+    static unique_ptr<Card> drawCard();
+    void startNewHand();
 };

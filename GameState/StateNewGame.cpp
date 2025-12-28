@@ -96,13 +96,13 @@ void StateNewGame::Init() {
 void StateNewGame::drawHand() {
     cout << "\n[DECK] rut 6 la tu bo bai : \n";
 
+    //reset bên deck
+    _deck->startNewHand();
     _hand.clear();
     while (_hand.size() < 6) {
         auto c = _deck->drawCard(); //rút 1 lá ngẫu nhiên từ deck
-        if (!c) {
-            _deck->checkAndRefillDeck();
-            continue;
-        }
+        if (!c) continue;
+        
         _hand.push_back(move(c));
     }
 }
